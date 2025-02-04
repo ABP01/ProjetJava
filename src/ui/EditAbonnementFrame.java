@@ -1,7 +1,7 @@
 package ui;
 
-import dao.AbonnementDAO;
 import models.Abonnement;
+import dao.AbonnementDAO;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,15 +9,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class EditAbonnementFrame extends JFrame {
+    private Abonnement abonnement;
     private JTextField libelleField;
     private JTextField dureeField;
     private JTextField prixField;
-    private Abonnement abonnement;
 
     public EditAbonnementFrame(Abonnement abonnement) {
         this.abonnement = abonnement;
-        setTitle("Modifier un abonnement");
-        setSize(400, 250);
+        setTitle("Modifier Abonnement");
+        setSize(400, 300);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -31,7 +31,6 @@ public class EditAbonnementFrame extends JFrame {
         panel.add(new JLabel("Libellé:"), gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 0;
         libelleField = new JTextField(20);
         libelleField.setText(abonnement.getLibelleOffre());
         panel.add(libelleField, gbc);
@@ -41,7 +40,6 @@ public class EditAbonnementFrame extends JFrame {
         panel.add(new JLabel("Durée (mois):"), gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 1;
         dureeField = new JTextField(20);
         dureeField.setText(String.valueOf(abonnement.getDureeMois()));
         panel.add(dureeField, gbc);
@@ -51,24 +49,15 @@ public class EditAbonnementFrame extends JFrame {
         panel.add(new JLabel("Prix Mensuel:"), gbc);
 
         gbc.gridx = 1;
-        gbc.gridy = 2;
         prixField = new JTextField(20);
         prixField.setText(String.valueOf(abonnement.getPrixMensuel()));
         panel.add(prixField, gbc);
 
+        JPanel buttonPanel = new JPanel();
         JButton saveButton = new JButton("Enregistrer");
-        saveButton.setBackground(new Color(0, 150, 0));
-        saveButton.setForeground(Color.WHITE);
-        saveButton.setFocusPainted(false);
-
         JButton cancelButton = new JButton("Annuler");
-        cancelButton.setBackground(new Color(150, 0, 0));
-        cancelButton.setForeground(Color.WHITE);
-        cancelButton.setFocusPainted(false);
-
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        buttonPanel.add(cancelButton);
         buttonPanel.add(saveButton);
+        buttonPanel.add(cancelButton);
 
         gbc.gridx = 0;
         gbc.gridy = 3;
@@ -110,6 +99,14 @@ public class EditAbonnementFrame extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 dispose();
             }
+        });
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> {
+            Abonnement abonnement = new Abonnement(); // Remplacez par un abonnement réel
+            EditAbonnementFrame frame = new EditAbonnementFrame(abonnement);
+            frame.setVisible(true);
         });
     }
 }

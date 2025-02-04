@@ -105,7 +105,7 @@ public class AbonneDAO {
         return abonne;
     }
 
-    public void updateAbonne(Abonne abonne) {
+    public static void updateAbonne(Abonne abonne) {
         String sql = "UPDATE abonne SET nom = ?, prenom = ?, date_inscription = ?, numero_telephone = ?, statut_souscription = ? WHERE id = ?";
         try (Connection conn = dbconn.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -121,7 +121,7 @@ public class AbonneDAO {
         }
     }
 
-    public void deleteAbonne(int id) {
+    public static void deleteAbonne(int id) {
         String sql = "DELETE FROM abonne WHERE id = ?";
         try (Connection conn = dbconn.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

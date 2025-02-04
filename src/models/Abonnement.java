@@ -6,7 +6,9 @@ public class Abonnement {
     private int dureeMois;
     private float prixMensuel;
 
-    
+    public Abonnement() {
+        // Constructeur par défaut
+    }
 
     public Abonnement(int id, String libelleOffre, int dureeMois, float prixMensuel) {
         this.id = id;
@@ -32,17 +34,14 @@ public class Abonnement {
     }
 
     public void setLibelleOffre(String libelle) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setLibelleOffre'");
+        this.libelleOffre = libelle;
     }
 
     public void setPrixMensuel(float prix) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setPrixMensuel'");
+        this.prixMensuel = prix;
     }
 
     public void setDureeMois(int duree) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setDureeMois'");
+        this.dureeMois = duree;
     }
 }

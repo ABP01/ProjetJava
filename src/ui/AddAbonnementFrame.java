@@ -85,7 +85,7 @@ public class AddAbonnementFrame extends JFrame {
                         return;
                     }
 
-                    Abonnement abonnement = new Abonnement(0, libelle, duree, prix);
+                    Abonnement abonnement = new Abonnement();
                     new AbonnementDAO().addAbonnement(abonnement);
                     JOptionPane.showMessageDialog(AddAbonnementFrame.this, "Abonnement ajouté avec succès", "Succès", JOptionPane.INFORMATION_MESSAGE);
                     dispose();
