@@ -8,15 +8,13 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class EditAbonnementFrame extends JFrame {
+public class AddAbonnementFrame extends JFrame {
     private JTextField libelleField;
     private JTextField dureeField;
     private JTextField prixField;
-    private Abonnement abonnement;
 
-    public EditAbonnementFrame(Abonnement abonnement) {
-        this.abonnement = abonnement;
-        setTitle("Modifier un abonnement");
+    public AddAbonnementFrame() {
+        setTitle("Ajouter un abonnement");
         setSize(400, 250);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -33,7 +31,6 @@ public class EditAbonnementFrame extends JFrame {
         gbc.gridx = 1;
         gbc.gridy = 0;
         libelleField = new JTextField(20);
-        libelleField.setText(abonnement.getLibelleOffre());
         panel.add(libelleField, gbc);
 
         gbc.gridx = 0;
@@ -43,7 +40,6 @@ public class EditAbonnementFrame extends JFrame {
         gbc.gridx = 1;
         gbc.gridy = 1;
         dureeField = new JTextField(20);
-        dureeField.setText(String.valueOf(abonnement.getDureeMois()));
         panel.add(dureeField, gbc);
 
         gbc.gridx = 0;
@@ -53,13 +49,12 @@ public class EditAbonnementFrame extends JFrame {
         gbc.gridx = 1;
         gbc.gridy = 2;
         prixField = new JTextField(20);
-        prixField.setText(String.valueOf(abonnement.getPrixMensuel()));
         panel.add(prixField, gbc);
 
-        JButton saveButton = new JButton("Enregistrer");
-        saveButton.setBackground(new Color(0, 150, 0));
-        saveButton.setForeground(Color.WHITE);
-        saveButton.setFocusPainted(false);
+        JButton addButton = new JButton("Ajouter");
+        addButton.setBackground(new Color(0, 150, 0));
+        addButton.setForeground(Color.WHITE);
+        addButton.setFocusPainted(false);
 
         JButton cancelButton = new JButton("Annuler");
         cancelButton.setBackground(new Color(150, 0, 0));
@@ -68,7 +63,7 @@ public class EditAbonnementFrame extends JFrame {
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.add(cancelButton);
-        buttonPanel.add(saveButton);
+        buttonPanel.add(addButton);
 
         gbc.gridx = 0;
         gbc.gridy = 3;
@@ -77,7 +72,7 @@ public class EditAbonnementFrame extends JFrame {
 
         add(panel);
 
-        saveButton.addActionListener(new ActionListener() {
+        addButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -86,21 +81,19 @@ public class EditAbonnementFrame extends JFrame {
                     float prix = Float.parseFloat(prixField.getText());
 
                     if (libelle.isEmpty() || duree <= 0 || prix <= 0) {
-                        JOptionPane.showMessageDialog(EditAbonnementFrame.this, "Veuillez remplir tous les champs correctement.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(AddAbonnementFrame.this, "Veuillez remplir tous les champs correctement.", "Erreur", JOptionPane.ERROR_MESSAGE);
                         return;
                     }
 
-                    abonnement.setLibelleOffre(libelle);
-                    abonnement.setDureeMois(duree);
-                    abonnement.setPrixMensuel(prix);
-                    new AbonnementDAO().updateAbonnement(abonnement);
-                    JOptionPane.showMessageDialog(EditAbonnementFrame.this, "Abonnement modifié avec succès", "Succès", JOptionPane.INFORMATION_MESSAGE);
+                    Abonnement abonnement = new Abonnement(0, libelle, duree, prix);
+                    new AbonnementDAO().addAbonnement(abonnement);
+                    JOptionPane.showMessageDialog(AddAbonnementFrame.this, "Abonnement ajouté avec succès", "Succès", JOptionPane.INFORMATION_MESSAGE);
                     dispose();
                 } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(EditAbonnementFrame.this, "Veuillez entrer des valeurs numériques valides pour la durée et le prix.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(AddAbonnementFrame.this, "Veuillez entrer des valeurs numériques valides pour la durée et le prix.", "Erreur", JOptionPane.ERROR_MESSAGE);
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    JOptionPane.showMessageDialog(EditAbonnementFrame.this, "Erreur lors de la modification de l'abonnement", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(AddAbonnementFrame.this, "Erreur lors de l'ajout de l'abonnement", "Erreur", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });

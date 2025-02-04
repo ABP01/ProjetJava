@@ -8,16 +8,17 @@ public class Abonne {
     private String prenom;
     private Date dateInscription;
     private String numeroTelephone;
+    private boolean abonnementActif;
+    private Abonnement abonnement;
 
-    public String getNumeroTelephone() {
-        return numeroTelephone;
-    }
-
-    public void setNumeroTelephone(String numeroTelephone) {
+    public Abonne(int id, String nom, String prenom, Date dateInscription, String numeroTelephone, boolean abonnementActif) {
+        this.id = id;
+        this.nom = nom;
+        this.prenom = prenom;
+        this.dateInscription = dateInscription;
         this.numeroTelephone = numeroTelephone;
+        this.abonnementActif = abonnementActif;
     }
-
-    private Boolean abonnementActif;
 
     public int getId() {
         return id;
@@ -51,22 +52,27 @@ public class Abonne {
         this.dateInscription = dateInscription;
     }
 
-    public Boolean getAbonnementActif() {
+    public String getNumeroTelephone() {
+        return numeroTelephone;
+    }
+
+    public void setNumeroTelephone(String numeroTelephone) {
+        this.numeroTelephone = numeroTelephone;
+    }
+
+    public boolean getAbonnementActif() {
         return abonnementActif;
     }
 
-    public void setAbonnementActif(Boolean abonnementActif) {
+    public void setAbonnementActif(boolean abonnementActif) {
         this.abonnementActif = abonnementActif;
     }
 
-    public Abonne(int id, String nom, String prenom, Date dateInscription, String numeroTelephone, Boolean abonnementActif) {
-        this.id = id;
-        this.nom = nom;
-        this.prenom = prenom;
-        this.dateInscription = dateInscription;
-        this.numeroTelephone = numeroTelephone;
-        this.abonnementActif = abonnementActif;
+    public Abonnement getAbonnement() {
+        return abonnement;
     }
 
-
+    public void setAbonnement(Abonnement abonnement) {
+        this.abonnement = abonnement;
+    }
 }
