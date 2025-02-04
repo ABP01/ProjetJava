@@ -1,3 +1,5 @@
+package models;
+
 import java.util.Date;
 
 public class Abonne {
@@ -5,6 +7,16 @@ public class Abonne {
     private String nom;
     private String prenom;
     private Date dateInscription;
+    private String numeroTelephone;
+
+    public String getNumeroTelephone() {
+        return numeroTelephone;
+    }
+
+    public void setNumeroTelephone(String numeroTelephone) {
+        this.numeroTelephone = numeroTelephone;
+    }
+
     private Boolean abonnementActif;
 
     public int getId() {
@@ -46,4 +58,15 @@ public class Abonne {
     public void setAbonnementActif(Boolean abonnementActif) {
         this.abonnementActif = abonnementActif;
     }
+
+    public Abonne(int id, String nom, String prenom, Date dateInscription, String numeroTelephone, Boolean abonnementActif) {
+        this.id = id;
+        this.nom = nom;
+        this.prenom = prenom;
+        this.dateInscription = dateInscription;
+        this.numeroTelephone = numeroTelephone;
+        this.abonnementActif = abonnementActif;
+    }
+
+
 }

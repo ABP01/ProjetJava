@@ -1,9 +1,10 @@
-import java.util.Date;
+package models;
+
 
 public class Abonnement {
     private int id;
     private String libelleOffre;
-    private Date dureeMois;
+    private int dureeMois;
     private float prixMensuel;
 
     public int getId() {
@@ -22,11 +23,11 @@ public class Abonnement {
         this.libelleOffre = libelleOffre;
     }
 
-    public Date getDureeMois() {
+    public int getDureeMois() {
         return dureeMois;
     }
 
-    public void setDureeMois(Date dureeMois) {
+    public void setDureeMois(int dureeMois) {
         this.dureeMois = dureeMois;
     }
 
@@ -35,6 +36,13 @@ public class Abonnement {
     }
 
     public void setPrixMensuel(float prixMensuel) {
+        this.prixMensuel = prixMensuel;
+    }
+
+    public Abonnement(int id, String libelleOffre, int dureeMois, float prixMensuel) {
+        this.id = id;
+        this.libelleOffre = libelleOffre;
+        this.dureeMois = dureeMois;
         this.prixMensuel = prixMensuel;
     }
 }

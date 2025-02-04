@@ -1,4 +1,4 @@
 package dao;
 
-public class ScouscriptionDAO {
+public class SouscriptionDAO {
 }
