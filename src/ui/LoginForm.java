@@ -5,8 +5,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class TestMain extends JFrame {
-    public TestMain() {
+public class LoginForm extends JFrame {
+    public LoginForm() {
         setTitle("Connexion - Salle de Sport");
         setSize(400, 300);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -51,7 +51,7 @@ public class TestMain extends JFrame {
                 String username = usernameField.getText();
                 String password = new String(passwordField.getPassword());
 
-                if (username.equals("admin") && password.equals("password")) {
+                if (username.equals("admin") && password.equals("admin")) {
                     JOptionPane.showMessageDialog(null, "Connexion réussie !", "Succès", JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(null, "Identifiants incorrects.", "Erreur", JOptionPane.ERROR_MESSAGE);
@@ -66,7 +66,7 @@ public class TestMain extends JFrame {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new TestMain().setVisible(true);
+                new LoginForm().setVisible(true);
             }
         });
     }
