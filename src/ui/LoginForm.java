@@ -3,7 +3,6 @@ package ui;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class LoginForm extends JFrame {
     public LoginForm() {
@@ -45,17 +44,16 @@ public class LoginForm extends JFrame {
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
         // ActionListener for login button
-        loginButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String username = usernameField.getText();
-                String password = new String(passwordField.getPassword());
+        loginButton.addActionListener(e -> {
+            String username = usernameField.getText();
+            String password = new String(passwordField.getPassword());
 
-                if (username.equals("admin") && password.equals("admin")) {
-                    JOptionPane.showMessageDialog(null, "Connexion réussie !", "Succès", JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    JOptionPane.showMessageDialog(null, "Identifiants incorrects.", "Erreur", JOptionPane.ERROR_MESSAGE);
-                }
+            if (username.equals("admin") && password.equals("admin")) {
+                JOptionPane.showMessageDialog(null, "Connexion réussie !", "Succès", JOptionPane.INFORMATION_MESSAGE);
+                new MainMenu().setVisible(true);
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(null, "Identifiants incorrects.", "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -63,11 +61,6 @@ public class LoginForm extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                new LoginForm().setVisible(true);
-            }
-        });
+        SwingUtilities.invokeLater(() -> new LoginForm().setVisible(true));
     }
 }
