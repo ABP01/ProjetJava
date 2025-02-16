@@ -24,7 +24,7 @@ public class GestionAbonnementsFrame extends JFrame {
     private JButton btnAjouter, btnModifier, btnSupprimer;
     private DefaultTableModel abonnementsModel;
 
-    public GestionAbonnementsFrame() {
+    public GestionAbonnementsFrame(int abonnementId) {
         setTitle("Gestion des Abonnements");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

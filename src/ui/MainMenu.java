@@ -109,7 +109,7 @@ public class MainMenu extends JFrame {
             int selectedRow = tableAbonnes.getSelectedRow();
             if (selectedRow != -1) {
                 int abonneId = (int) tableAbonnes.getValueAt(selectedRow, 0);
-                new GestionAbonnesFrame(abonneId).setVisible(true);
+                new GestionAbonnesFrame().setVisible(true);
             } else {
                 JOptionPane.showMessageDialog(this, "Veuillez sélectionner un abonné à modifier.");
             }
@@ -150,7 +150,7 @@ public class MainMenu extends JFrame {
         panelActionsAbonnements.add(btnSupprimerAbonnement);
 
         // ActionListener pour les boutons des abonnements
-        btnAjouterAbonnement.addActionListener(e -> new GestionAbonnementsFrame().setVisible(true));
+        btnAjouterAbonnement.addActionListener(e -> new GestionAbonnementsFrame(0).setVisible(true));
         btnModifierAbonnement.addActionListener(e -> {
             int selectedRow = tableAbonnements.getSelectedRow();
             if (selectedRow != -1) {
