@@ -1,8 +1,20 @@
 package ui;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.sql.SQLException;
+import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+
 import dao.AbonnementDAO;
 import models.Abonnement;
 
@@ -10,6 +22,7 @@ public class GestionAbonnementsFrame extends JFrame {
     private JTable tableAbonnements;
     private JTextField txtLibelle, txtDuree, txtPrix;
     private JButton btnAjouter, btnModifier, btnSupprimer;
+    private DefaultTableModel abonnementsModel;
 
     public GestionAbonnementsFrame() {
         setTitle("Gestion des Abonnements");
@@ -39,7 +52,10 @@ public class GestionAbonnementsFrame extends JFrame {
         panelBoutons.add(btnSupprimer);
 
         // Table pour afficher les abonnements
-        tableAbonnements = new JTable();
+        abonnementsModel = new DefaultTableModel(
+                new Object[][] {},
+                new String[] { "ID", "Libellé", "Durée (mois)", "Prix Mensuel" });
+        tableAbonnements = new JTable(abonnementsModel);
         JScrollPane scrollPane = new JScrollPane(tableAbonnements);
 
         // Ajout des composants à la fenêtre
@@ -83,14 +99,68 @@ public class GestionAbonnementsFrame extends JFrame {
     }
 
     private void modifierAbonnement() {
-        // Implémentez la logique pour modifier un abonnement
+        int selectedRow = tableAbonnements.getSelectedRow();
+        if (selectedRow != -1) {
+            int abonnementId = (int) tableAbonnements.getValueAt(selectedRow, 0);
+            String libelle = txtLibelle.getText();
+            int duree = Integer.parseInt(txtDuree.getText());
+            float prix = Float.parseFloat(txtPrix.getText());
+
+            if (libelle.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs");
+                return;
+            }
+
+            try {
+                Abonnement abonnement = new Abonnement(abonnementId, libelle, duree, prix);
+                AbonnementDAO abonnementDAO = new AbonnementDAO();
+                abonnementDAO.updateAbonnement(abonnement);
+                chargerAbonnements(); // Recharger la liste des abonnements
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Erreur lors de la modification de l'abonnement");
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Veuillez sélectionner un abonnement à modifier");
+        }
     }
 
     private void supprimerAbonnement() {
-        // Implémentez la logique pour supprimer un abonnement
+        int selectedRow = tableAbonnements.getSelectedRow();
+        if (selectedRow != -1) {
+            int abonnementId = (int) tableAbonnements.getValueAt(selectedRow, 0);
+            int confirm = JOptionPane.showConfirmDialog(this, "Êtes-vous sûr de vouloir supprimer cet abonnement ?",
+                    "Confirmation", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                try {
+                    AbonnementDAO.deleteAbonnement(abonnementId);
+                    chargerAbonnements(); // Recharger la liste des abonnements
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "Erreur lors de la suppression de l'abonnement");
+                }
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Veuillez sélectionner un abonnement à supprimer");
+        }
     }
 
     private void chargerAbonnements() {
-        // Implémentez la logique pour charger les abonnements dans la JTable
+        try {
+            List<Abonnement> abonnements = AbonnementDAO.getAllAbonnements();
+            abonnementsModel.setRowCount(0); // Clear existing rows
+
+            for (Abonnement abonnement : abonnements) {
+                abonnementsModel.addRow(new Object[] {
+                        abonnement.getId(),
+                        abonnement.getLibelleOffre(),
+                        abonnement.getDureeMois(),
+                        abonnement.getPrixMensuel()
+                });
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Erreur lors du chargement des abonnements");
+        }
     }
 }
