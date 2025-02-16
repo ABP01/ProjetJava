@@ -1,25 +1,40 @@
 package dao;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import javax.swing.JOptionPane;
+
 import models.Abonne;
 import models.Abonnement;
-
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class AbonneDAO {
     public static void ajouterAbonne(Abonne abonne) {
         String sql = "INSERT INTO abonne (nom, prenom, date_inscription, numero_telephone, statut_souscription) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = dbconn.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+                PreparedStatement stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setString(1, abonne.getNom());
             stmt.setString(2, abonne.getPrenom());
-            stmt.setDate(3, new java.sql.Date(abonne.getDateInscription().getTime()));
+            stmt.setDate(3, java.sql.Date.valueOf(abonne.getDateInscription()));
             stmt.setString(4, abonne.getNumeroTelephone());
             stmt.setBoolean(5, abonne.getAbonnementActif());
 
             stmt.executeUpdate();
+
+            // Récupérer l'ID généré automatiquement
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    abonne.setId(generatedKeys.getInt(1));
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -28,22 +43,28 @@ public class AbonneDAO {
     public static List<Abonne> getAbonnes() {
         List<Abonne> abonnes = new ArrayList<>();
         String sql = "SELECT * FROM abonne";
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
         try (Connection conn = dbconn.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
+                Date dateInscription = rs.getDate("date_inscription");
+                String dateInscriptionStr = dateFormat.format(dateInscription);
+
                 abonnes.add(new Abonne(
                         rs.getInt("id"),
                         rs.getString("nom"),
                         rs.getString("prenom"),
-                        rs.getDate("date_inscription"),
+                        dateInscriptionStr,
                         rs.getString("numero_telephone"),
                         rs.getBoolean("statut_souscription")
                 ));
             }
         } catch (SQLException e) {
             e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Erreur lors de la récupération des abonnés : " + e.getMessage());
         }
         return abonnes;
     }
@@ -60,7 +81,7 @@ public class AbonneDAO {
                         rs.getInt("id"),
                         rs.getString("nom"),
                         rs.getString("prenom"),
-                        rs.getDate("date_inscription"),
+                        rs.getDate("date_inscription").toString(),
                         rs.getString("numero_telephone"),
                         rs.getBoolean("statut_souscription")
                 );
@@ -87,7 +108,7 @@ public class AbonneDAO {
                         rs.getInt("id"),
                         rs.getString("nom"),
                         rs.getString("prenom"),
-                        rs.getDate("date_inscription"),
+                        rs.getDate("date_inscription").toString(),
                         rs.getString("numero_telephone"),
                         rs.getBoolean("statut_souscription")
                 );
@@ -111,7 +132,7 @@ public class AbonneDAO {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, abonne.getNom());
             stmt.setString(2, abonne.getPrenom());
-            stmt.setDate(3, new java.sql.Date(abonne.getDateInscription().getTime()));
+            stmt.setDate(3, java.sql.Date.valueOf(abonne.getDateInscription()));
             stmt.setString(4, abonne.getNumeroTelephone());
             stmt.setBoolean(5, abonne.getAbonnementActif());
             stmt.setInt(6, abonne.getId());

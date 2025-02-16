@@ -1,17 +1,21 @@
 package models;
 
-import java.util.Date;
-
 public class Abonne {
     private int id;
     private String nom;
     private String prenom;
-    private Date dateInscription;
+    private String dateInscription;
     private String numeroTelephone;
     private boolean abonnementActif;
-    private Abonnement abonnement;
+    private String statutSouscription;
+    private Abonnement abonnement; // Ajout du champ abonnement
 
-    public Abonne(int id, String nom, String prenom, Date dateInscription, String numeroTelephone, boolean abonnementActif) {
+    public Abonne() {
+        // Constructeur par défaut
+    }
+
+    public Abonne(int id, String nom, String prenom, String dateInscription, String numeroTelephone,
+            boolean abonnementActif) {
         this.id = id;
         this.nom = nom;
         this.prenom = prenom;
@@ -44,11 +48,11 @@ public class Abonne {
         this.prenom = prenom;
     }
 
-    public Date getDateInscription() {
+    public String getDateInscription() {
         return dateInscription;
     }
 
-    public void setDateInscription(Date dateInscription) {
+    public void setDateInscription(String dateInscription) {
         this.dateInscription = dateInscription;
     }
 
@@ -66,6 +70,14 @@ public class Abonne {
 
     public void setAbonnementActif(boolean abonnementActif) {
         this.abonnementActif = abonnementActif;
+    }
+
+    public String getStatutSouscription() {
+        return statutSouscription;
+    }
+
+    public void setStatutSouscription(String statutSouscription) {
+        this.statutSouscription = statutSouscription;
     }
 
     public Abonnement getAbonnement() {
