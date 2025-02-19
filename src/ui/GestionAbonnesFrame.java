@@ -67,7 +67,7 @@ public class GestionAbonnesFrame extends JFrame {
         // Table pour afficher les abonnés
         abonnesModel = new DefaultTableModel(
                 new Object[][] {},
-                new String[] { "ID", "Nom", "Prénom", "Date d'inscription", "Téléphone", "Statut" });
+                new String[] { "ID", "Nom", "Prénom", "Téléphone" });
         tableAbonnes = new JTable(abonnesModel);
         sorter = new TableRowSorter<>(abonnesModel);
         tableAbonnes.setRowSorter(sorter);
@@ -112,7 +112,7 @@ public class GestionAbonnesFrame extends JFrame {
         String telephone = txtTelephone.getText();
 
         if (nom.isEmpty() || prenom.isEmpty() || telephone.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs");
+            JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs.");
             return;
         }
 
@@ -124,16 +124,11 @@ public class GestionAbonnesFrame extends JFrame {
     private void remplirChampsPourModification() {
         int selectedRow = tableAbonnes.getSelectedRow();
         if (selectedRow != -1) {
-            int abonneId = (int) tableAbonnes.getValueAt(selectedRow, 0);
-            AbonneDAO abonneDAO = new AbonneDAO();
-            Abonne abonne = abonneDAO.getAbonneWithAbonnement(abonneId);
-            if (abonne != null) {
-                txtNom.setText(abonne.getNom());
-                txtPrenom.setText(abonne.getPrenom());
-                txtTelephone.setText(abonne.getNumeroTelephone());
-            }
+            txtNom.setText(tableAbonnes.getValueAt(selectedRow, 1).toString());
+            txtPrenom.setText(tableAbonnes.getValueAt(selectedRow, 2).toString());
+            txtTelephone.setText(tableAbonnes.getValueAt(selectedRow, 3).toString());
         } else {
-            JOptionPane.showMessageDialog(this, "Veuillez sélectionner un abonné à modifier");
+            JOptionPane.showMessageDialog(this, "Veuillez sélectionner un abonné à modifier.");
         }
     }
 
@@ -143,7 +138,7 @@ public class GestionAbonnesFrame extends JFrame {
             int abonneId = (int) tableAbonnes.getValueAt(selectedRow, 0);
             modifierAbonne(abonneId);
         } else {
-            JOptionPane.showMessageDialog(this, "Aucune modification à valider");
+            JOptionPane.showMessageDialog(this, "Aucune modification à valider.");
         }
     }
 
@@ -153,7 +148,7 @@ public class GestionAbonnesFrame extends JFrame {
         String telephone = txtTelephone.getText();
 
         if (nom.isEmpty() || prenom.isEmpty() || telephone.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs");
+            JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs.");
             return;
         }
 
@@ -173,7 +168,7 @@ public class GestionAbonnesFrame extends JFrame {
                 chargerAbonnes();
             }
         } else {
-            JOptionPane.showMessageDialog(this, "Veuillez sélectionner un abonné à supprimer");
+            JOptionPane.showMessageDialog(this, "Veuillez sélectionner un abonné à supprimer.");
         }
     }
 
@@ -191,9 +186,7 @@ public class GestionAbonnesFrame extends JFrame {
                     abonne.getId(),
                     abonne.getNom(),
                     abonne.getPrenom(),
-                    abonne.getDateInscription(),
-                    abonne.getNumeroTelephone(),
-                    abonne.getAbonnementActif() ? "Actif" : "Inactif"
+                    abonne.getNumeroTelephone()
             });
         }
     }
