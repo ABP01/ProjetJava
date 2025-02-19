@@ -151,4 +151,41 @@ public class AbonneDAO {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'subscribeAbonne'");
     }
+
+    public static void souscrireAbonnement(int abonneId, int abonnementId) {
+        String sql = "INSERT INTO souscription (id_abonne, id_abonnement, date_debut) VALUES (?, ?, ?)";
+        try (Connection conn = dbconn.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, abonneId);
+            stmt.setInt(2, abonnementId);
+            stmt.setDate(3, new java.sql.Date(System.currentTimeMillis())); // Date de début de la souscription
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public static void renouvelerAbonnement(int abonneId) {
+        String sql = "UPDATE souscription SET date_debut = ? WHERE id_abonne = ? AND date_fin IS NULL";
+        try (Connection conn = dbconn.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDate(1, new java.sql.Date(System.currentTimeMillis())); // Met à jour la date de début
+            stmt.setInt(2, abonneId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public static void resilierAbonnement(int abonneId) {
+        String sql = "UPDATE souscription SET date_fin = ? WHERE id_abonne = ? AND date_fin IS NULL";
+        try (Connection conn = dbconn.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setDate(1, new java.sql.Date(System.currentTimeMillis())); // Met à jour la date de fin
+            stmt.setInt(2, abonneId);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

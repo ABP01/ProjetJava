@@ -86,4 +86,9 @@ public class Abonne {
     public double getMontantAbonnement() {
         return 0;
     }
+
+    public boolean isAbonne() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'isAbonne'");
+    }
 }
