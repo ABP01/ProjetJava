@@ -10,6 +10,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AbonnementDAO {
+    public static List<Abonnement> rechercherAbonnements(String recherche) {
+        List<Abonnement> abonnements = new ArrayList<>();
+        String sql = "SELECT * FROM abonnement WHERE libelle LIKE ?";
+        try (Connection conn = dbconn.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, "%" + recherche + "%");
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                abonnements.add(new Abonnement(
+                        rs.getInt("id"),
+                        rs.getString("libelle"),
+                        rs.getInt("duree_mois"),
+                        rs.getFloat("prix_mensuel")
+                ));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return abonnements;
+    }
+
     public void addAbonnement(Abonnement abonnement) throws SQLException {
         String query = "INSERT INTO abonnement (libelle, duree_mois, prix_mensuel) VALUES (?, ?, ?)";
         try (Connection conn = dbconn.getConnection();

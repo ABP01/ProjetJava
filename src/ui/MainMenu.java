@@ -104,16 +104,34 @@ public class MainMenu extends JFrame {
         });
 
         // ActionListener pour les boutons des abonnés
-        btnAjouterAbonne.addActionListener(e -> new GestionAbonnesFrame().setVisible(true));
+        btnAjouterAbonne.addActionListener(e -> {
+            GestionAbonnesFrame gestionAbonnesFrame = new GestionAbonnesFrame();
+            gestionAbonnesFrame.setVisible(true);
+            gestionAbonnesFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosed(java.awt.event.WindowEvent windowEvent) {
+                    chargerAbonnes();
+                }
+            });
+        });
+
         btnModifierAbonne.addActionListener(e -> {
             int selectedRow = tableAbonnes.getSelectedRow();
             if (selectedRow != -1) {
                 int abonneId = (int) tableAbonnes.getValueAt(selectedRow, 0);
-                new GestionAbonnesFrame().setVisible(true);
+                GestionAbonnesFrame gestionAbonnesFrame = new GestionAbonnesFrame();
+                gestionAbonnesFrame.setVisible(true);
+                gestionAbonnesFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+                    @Override
+                    public void windowClosed(java.awt.event.WindowEvent windowEvent) {
+                        chargerAbonnes();
+                    }
+                });
             } else {
                 JOptionPane.showMessageDialog(this, "Veuillez sélectionner un abonné à modifier.");
             }
         });
+
         btnSupprimerAbonne.addActionListener(e -> {
             int selectedRow = tableAbonnes.getSelectedRow();
             if (selectedRow != -1) {
@@ -150,12 +168,12 @@ public class MainMenu extends JFrame {
         panelActionsAbonnements.add(btnSupprimerAbonnement);
 
         // ActionListener pour les boutons des abonnements
-        btnAjouterAbonnement.addActionListener(e -> new GestionAbonnementsFrame(0).setVisible(true));
+        btnAjouterAbonnement.addActionListener(e -> new GestionAbonnementsFrame().setVisible(true));
         btnModifierAbonnement.addActionListener(e -> {
             int selectedRow = tableAbonnements.getSelectedRow();
             if (selectedRow != -1) {
                 int abonnementId = (int) tableAbonnements.getValueAt(selectedRow, 0);
-                new GestionAbonnementsFrame(abonnementId).setVisible(true);
+                new GestionAbonnementsFrame().setVisible(true);
             } else {
                 JOptionPane.showMessageDialog(this, "Veuillez sélectionner un abonnement à modifier.");
             }

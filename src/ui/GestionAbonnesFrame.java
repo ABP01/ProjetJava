@@ -13,6 +13,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
+import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -21,9 +24,10 @@ import models.Abonne;
 
 public class GestionAbonnesFrame extends JFrame {
     private JTable tableAbonnes;
-    private JTextField txtNom, txtPrenom, txtTelephone, txtRecherche;
-    private JButton btnAjouter, btnModifier, btnSupprimer, btnRechercher;
+    private JTextField txtNom, txtPrenom, txtTelephone, txtRechercher;
+    private JButton btnAjouter, btnModifier, btnSupprimer, btnValider;
     private DefaultTableModel abonnesModel;
+    private TableRowSorter<DefaultTableModel> sorter;
 
     public GestionAbonnesFrame() {
         setTitle("Gestion des Abonnés");
@@ -43,35 +47,60 @@ public class GestionAbonnesFrame extends JFrame {
         txtTelephone = new JTextField();
         panelForm.add(txtTelephone);
 
+        // Panel pour la recherche
+        JPanel panelRechercher = new JPanel(new BorderLayout());
+        panelRechercher.add(new JLabel("Rechercher:"), BorderLayout.WEST);
+        txtRechercher = new JTextField();
+        panelRechercher.add(txtRechercher, BorderLayout.CENTER);
+
         // Panel pour les boutons
         JPanel panelBoutons = new JPanel();
         btnAjouter = new JButton("Ajouter");
         btnModifier = new JButton("Modifier");
         btnSupprimer = new JButton("Supprimer");
-        btnRechercher = new JButton("Rechercher");
+        btnValider = new JButton("Valider");
         panelBoutons.add(btnAjouter);
         panelBoutons.add(btnModifier);
         panelBoutons.add(btnSupprimer);
-        panelBoutons.add(btnRechercher);
+        panelBoutons.add(btnValider);
 
         // Table pour afficher les abonnés
         abonnesModel = new DefaultTableModel(
                 new Object[][] {},
                 new String[] { "ID", "Nom", "Prénom", "Date d'inscription", "Téléphone", "Statut" });
         tableAbonnes = new JTable(abonnesModel);
+        sorter = new TableRowSorter<>(abonnesModel);
+        tableAbonnes.setRowSorter(sorter);
         JScrollPane scrollPane = new JScrollPane(tableAbonnes);
 
         // Ajout des composants à la fenêtre
         setLayout(new BorderLayout());
         add(panelForm, BorderLayout.NORTH);
+        add(panelRechercher, BorderLayout.CENTER);
         add(scrollPane, BorderLayout.CENTER);
         add(panelBoutons, BorderLayout.SOUTH);
 
         // Gestion des événements
         btnAjouter.addActionListener(e -> ajouterAbonne());
-        btnModifier.addActionListener(e -> modifierAbonne());
+        btnModifier.addActionListener(e -> remplirChampsPourModification());
         btnSupprimer.addActionListener(e -> supprimerAbonne());
-        btnRechercher.addActionListener(e -> rechercherAbonne());
+        btnValider.addActionListener(e -> validerModification());
+        txtRechercher.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                rechercherAbonne();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                rechercherAbonne();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                rechercherAbonne();
+            }
+        });
 
         // Charger les abonnés au démarrage
         chargerAbonnes();
@@ -92,25 +121,45 @@ public class GestionAbonnesFrame extends JFrame {
         chargerAbonnes();
     }
 
-    private void modifierAbonne() {
+    private void remplirChampsPourModification() {
         int selectedRow = tableAbonnes.getSelectedRow();
         if (selectedRow != -1) {
             int abonneId = (int) tableAbonnes.getValueAt(selectedRow, 0);
-            String nom = txtNom.getText();
-            String prenom = txtPrenom.getText();
-            String telephone = txtTelephone.getText();
-
-            if (nom.isEmpty() || prenom.isEmpty() || telephone.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs");
-                return;
+            AbonneDAO abonneDAO = new AbonneDAO();
+            Abonne abonne = abonneDAO.getAbonneWithAbonnement(abonneId);
+            if (abonne != null) {
+                txtNom.setText(abonne.getNom());
+                txtPrenom.setText(abonne.getPrenom());
+                txtTelephone.setText(abonne.getNumeroTelephone());
             }
-
-            Abonne abonne = new Abonne(abonneId, nom, prenom, new java.util.Date(), telephone, true);
-            AbonneDAO.updateAbonne(abonne);
-            chargerAbonnes();
         } else {
             JOptionPane.showMessageDialog(this, "Veuillez sélectionner un abonné à modifier");
         }
+    }
+
+    private void validerModification() {
+        int selectedRow = tableAbonnes.getSelectedRow();
+        if (selectedRow != -1) {
+            int abonneId = (int) tableAbonnes.getValueAt(selectedRow, 0);
+            modifierAbonne(abonneId);
+        } else {
+            JOptionPane.showMessageDialog(this, "Aucune modification à valider");
+        }
+    }
+
+    private void modifierAbonne(int abonneId) {
+        String nom = txtNom.getText();
+        String prenom = txtPrenom.getText();
+        String telephone = txtTelephone.getText();
+
+        if (nom.isEmpty() || prenom.isEmpty() || telephone.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Veuillez remplir tous les champs");
+            return;
+        }
+
+        Abonne abonne = new Abonne(abonneId, nom, prenom, new java.util.Date(), telephone, true);
+        AbonneDAO.updateAbonne(abonne);
+        chargerAbonnes();
     }
 
     private void supprimerAbonne() {
@@ -129,11 +178,8 @@ public class GestionAbonnesFrame extends JFrame {
     }
 
     private void rechercherAbonne() {
-        String searchText = txtNom.getText();
-        DefaultTableModel model = (DefaultTableModel) tableAbonnes.getModel();
-        TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(model);
-        tableAbonnes.setRowSorter(sorter);
-        sorter.setRowFilter(RowFilter.regexFilter(searchText));
+        String searchText = txtRechercher.getText();
+        sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText));
     }
 
     private void chargerAbonnes() {
@@ -150,5 +196,9 @@ public class GestionAbonnesFrame extends JFrame {
                     abonne.getAbonnementActif() ? "Actif" : "Inactif"
             });
         }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new GestionAbonnesFrame().setVisible(true));
     }
 }
