@@ -44,7 +44,7 @@ public class MainMenu extends JFrame {
     private DefaultTableModel souscriptionsModel;
 
     public MainMenu() {
-        setTitle("Système de Gestion des Abonnés et Abonnements - IAI-TOGO");
+        setTitle("Système de Gestion des Abonnés et Abonnements");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1000, 600);
         setLocationRelativeTo(null);
@@ -194,90 +194,7 @@ public class MainMenu extends JFrame {
         });
 
         // Onglet des souscriptions
-        JPanel panelSouscriptions = new JPanel();
-        tabbedPane.addTab("Souscriptions", new ImageIcon("icons/subscriptions.png"), panelSouscriptions,
-                "Gérer les souscriptions");
-        panelSouscriptions.setLayout(new BorderLayout(0, 0));
-
-        // Tableau des souscriptions
-        souscriptionsModel = new DefaultTableModel(
-                new Object[][] {},
-                new String[] { "ID", "ID Abonné", "ID Abonnement", "Date de début" });
-        tableSouscriptions = new JTable(souscriptionsModel);
-        panelSouscriptions.add(new JScrollPane(tableSouscriptions), BorderLayout.CENTER);
-
-        // Panneau d'actions pour les souscriptions
-        JPanel panelActionsSouscriptions = new JPanel();
-        panelSouscriptions.add(panelActionsSouscriptions, BorderLayout.SOUTH);
-        panelActionsSouscriptions.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
-
-        JButton btnAjouterSouscription = new JButton("Ajouter");
-        panelActionsSouscriptions.add(btnAjouterSouscription);
-        JButton btnModifierSouscription = new JButton("Modifier");
-        panelActionsSouscriptions.add(btnModifierSouscription);
-        JButton btnSupprimerSouscription = new JButton("Supprimer");
-        panelActionsSouscriptions.add(btnSupprimerSouscription);
-
-        // ActionListener pour les boutons des souscriptions
-        btnAjouterSouscription.addActionListener(e -> {
-            String idAbonneStr = JOptionPane.showInputDialog(this, "Entrez l'ID de l'abonné:");
-            String idAbonnementStr = JOptionPane.showInputDialog(this, "Entrez l'ID de l'abonnement:");
-            if (idAbonneStr != null && idAbonnementStr != null) {
-                try {
-                    int idAbonne = Integer.parseInt(idAbonneStr);
-                    int idAbonnement = Integer.parseInt(idAbonnementStr);
-                    Souscription souscription = new Souscription(0, idAbonne, idAbonnement, new java.util.Date());
-                    SouscriptionDAO souscriptionDAO = new SouscriptionDAO();
-                    souscriptionDAO.addSouscription(souscription);
-                    chargerSouscriptions();
-                } catch (NumberFormatException | SQLException ex) {
-                    JOptionPane.showMessageDialog(this, "Erreur lors de l'ajout de la souscription.");
-                }
-            }
-        });
-
-        btnModifierSouscription.addActionListener(e -> {
-            int selectedRow = tableSouscriptions.getSelectedRow();
-            if (selectedRow != -1) {
-                int modelRow = tableSouscriptions.convertRowIndexToModel(selectedRow);
-                Souscription selectedSouscription = souscriptionsList.get(modelRow);
-                SouscriptionFormDialog dialog = new SouscriptionFormDialog(this, selectedSouscription);
-                dialog.setVisible(true);
-
-                if (dialog.isConfirmed()) {
-                    Souscription updatedSouscription = dialog.getSouscription();
-                    try {
-                        SouscriptionDAO.updateSouscription(updatedSouscription);
-                        souscriptionsList.set(modelRow, updatedSouscription);
-                        souscriptionsModel.setValueAt(updatedSouscription.getIdAbonne(), modelRow, 1);
-                        souscriptionsModel.setValueAt(updatedSouscription.getIdAbonnement(), modelRow, 2);
-                        souscriptionsModel.setValueAt(updatedSouscription.getDateDebut(), modelRow, 3);
-                    } catch (SQLException ex) {
-                        JOptionPane.showMessageDialog(this, "Erreur lors de la modification de la souscription.",
-                                "Erreur",
-                                JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, "Veuillez sélectionner une souscription à modifier.");
-            }
-        });
-
-        btnSupprimerSouscription.addActionListener(e -> {
-            int selectedRow = tableSouscriptions.getSelectedRow();
-            if (selectedRow != -1) {
-                int modelRow = tableSouscriptions.convertRowIndexToModel(selectedRow);
-                try {
-                    SouscriptionDAO.deleteSouscription(souscriptionsList.get(modelRow).getId());
-                    souscriptionsList.remove(modelRow);
-                    souscriptionsModel.removeRow(modelRow);
-                } catch (SQLException ex) {
-                    JOptionPane.showMessageDialog(this, "Erreur lors de la suppression de la souscription.");
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, "Veuillez sélectionner une souscription à supprimer.");
-            }
-        });
+        
 
         // Onglet des statistiques
         JPanel panelStatistiques = new JPanel();
@@ -316,7 +233,6 @@ public class MainMenu extends JFrame {
         // Charger les abonnés au démarrage
         chargerAbonnes();
         chargerAbonnements();
-        chargerSouscriptions();
 
         // Afficher la fenêtre
         setVisible(true);
@@ -365,24 +281,7 @@ public class MainMenu extends JFrame {
         }
     }
 
-    private void chargerSouscriptions() {
-        try {
-            souscriptionsList = SouscriptionDAO.getAllSouscriptions();
-            DefaultTableModel model = (DefaultTableModel) tableSouscriptions.getModel();
-            model.setRowCount(0); // Clear existing rows
 
-            for (Souscription souscription : souscriptionsList) {
-                model.addRow(new Object[] {
-                        souscription.getId(),
-                        souscription.getIdAbonne(),
-                        souscription.getIdAbonnement(),
-                        souscription.getDateDebut()
-                });
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
     public static void main(String[] args) {
         // Exécuter l'application

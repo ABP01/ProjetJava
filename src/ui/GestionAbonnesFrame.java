@@ -25,7 +25,7 @@ import models.Abonne;
 public class GestionAbonnesFrame extends JFrame {
     private JTable tableAbonnes;
     private JTextField txtNom, txtPrenom, txtTelephone, txtRechercher;
-    private JButton btnAjouter, btnModifier, btnSupprimer, btnValider;
+    private JButton btnAjouter, btnModifier, btnSupprimer, btnValider, btnSouscrire, btnRenouveler, btnResilier;
     private DefaultTableModel abonnesModel;
     private TableRowSorter<DefaultTableModel> sorter;
 
@@ -59,15 +59,21 @@ public class GestionAbonnesFrame extends JFrame {
         btnModifier = new JButton("Modifier");
         btnSupprimer = new JButton("Supprimer");
         btnValider = new JButton("Valider");
+        btnSouscrire = new JButton("Souscrire");
+        btnRenouveler = new JButton("Renouveler");
+        btnResilier = new JButton("Résilier");
         panelBoutons.add(btnAjouter);
         panelBoutons.add(btnModifier);
         panelBoutons.add(btnSupprimer);
         panelBoutons.add(btnValider);
+        panelBoutons.add(btnSouscrire);
+        panelBoutons.add(btnRenouveler);
+        panelBoutons.add(btnResilier);
 
         // Table pour afficher les abonnés
         abonnesModel = new DefaultTableModel(
                 new Object[][] {},
-                new String[] { "ID", "Nom", "Prénom", "Téléphone" });
+                new String[] { "ID", "Nom", "Prénom", "Téléphone", "Abonné" });
         tableAbonnes = new JTable(abonnesModel);
         sorter = new TableRowSorter<>(abonnesModel);
         tableAbonnes.setRowSorter(sorter);
@@ -85,6 +91,9 @@ public class GestionAbonnesFrame extends JFrame {
         btnModifier.addActionListener(e -> remplirChampsPourModification());
         btnSupprimer.addActionListener(e -> supprimerAbonne());
         btnValider.addActionListener(e -> validerModification());
+        btnSouscrire.addActionListener(e -> souscrireAbonnement());
+        btnRenouveler.addActionListener(e -> renouvelerAbonnement());
+        btnResilier.addActionListener(e -> resilierAbonnement());
         txtRechercher.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -116,7 +125,7 @@ public class GestionAbonnesFrame extends JFrame {
             return;
         }
 
-        Abonne abonne = new Abonne(0, nom, prenom, new java.util.Date(), telephone, true);
+        Abonne abonne = new Abonne(0, nom, prenom, new java.util.Date(), telephone, false); // Par défaut, non abonné
         AbonneDAO.ajouterAbonne(abonne);
         chargerAbonnes();
     }
@@ -152,7 +161,7 @@ public class GestionAbonnesFrame extends JFrame {
             return;
         }
 
-        Abonne abonne = new Abonne(abonneId, nom, prenom, new java.util.Date(), telephone, true);
+        Abonne abonne = new Abonne(abonneId, nom, prenom, new java.util.Date(), telephone, false); // Par défaut, non abonné
         AbonneDAO.updateAbonne(abonne);
         chargerAbonnes();
     }
@@ -172,6 +181,39 @@ public class GestionAbonnesFrame extends JFrame {
         }
     }
 
+    private void souscrireAbonnement() {
+        int selectedRow = tableAbonnes.getSelectedRow();
+        if (selectedRow != -1) {
+            int abonneId = (int) tableAbonnes.getValueAt(selectedRow, 0);
+            AbonneDAO.souscrireAbonnement(abonneId);
+            chargerAbonnes();
+        } else {
+            JOptionPane.showMessageDialog(this, "Veuillez sélectionner un abonné.");
+        }
+    }
+
+    private void renouvelerAbonnement() {
+        int selectedRow = tableAbonnes.getSelectedRow();
+        if (selectedRow != -1) {
+            int abonneId = (int) tableAbonnes.getValueAt(selectedRow, 0);
+            AbonneDAO.renouvelerAbonnement(abonneId);
+            chargerAbonnes();
+        } else {
+            JOptionPane.showMessageDialog(this, "Veuillez sélectionner un abonné.");
+        }
+    }
+
+    private void resilierAbonnement() {
+        int selectedRow = tableAbonnes.getSelectedRow();
+        if (selectedRow != -1) {
+            int abonneId = (int) tableAbonnes.getValueAt(selectedRow, 0);
+            AbonneDAO.resilierAbonnement(abonneId);
+            chargerAbonnes();
+        } else {
+            JOptionPane.showMessageDialog(this, "Veuillez sélectionner un abonné.");
+        }
+    }
+
     private void rechercherAbonne() {
         String searchText = txtRechercher.getText();
         sorter.setRowFilter(RowFilter.regexFilter("(?i)" + searchText));
@@ -186,7 +228,8 @@ public class GestionAbonnesFrame extends JFrame {
                     abonne.getId(),
                     abonne.getNom(),
                     abonne.getPrenom(),
-                    abonne.getNumeroTelephone()
+                    abonne.getNumeroTelephone(),
+                    abonne.isAbonne() ? "Oui" : "Non"
             });
         }
     }
