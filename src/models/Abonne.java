@@ -20,6 +20,9 @@ public class Abonne {
         this.abonnementActif = abonnementActif;
     }
 
+    public Abonne(String bob, boolean b, double v, String semestriel) {
+    }
+
     public int getId() {
         return id;
     }
@@ -74,5 +77,13 @@ public class Abonne {
 
     public void setAbonnement(Abonnement abonnement) {
         this.abonnement = abonnement;
+    }
+
+    public boolean isActif() {
+        return false;
+    }
+
+    public double getMontantAbonnement() {
+        return 0;
     }
 }
