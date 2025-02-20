@@ -3,6 +3,7 @@ package ui;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import dao.UserDAO;
 
 public class LoginForm extends JFrame {
     public LoginForm() {
@@ -47,8 +48,8 @@ public class LoginForm extends JFrame {
         loginButton.addActionListener(e -> {
             String username = usernameField.getText();
             String password = new String(passwordField.getPassword());
-
-            if (username.equals("admin") && password.equals("admin")) {
+        
+            if (UserDAO.authenticate(username, password)) {
                 JOptionPane.showMessageDialog(null, "Connexion réussie !", "Succès", JOptionPane.INFORMATION_MESSAGE);
                 new MainMenu().setVisible(true);
                 dispose();
