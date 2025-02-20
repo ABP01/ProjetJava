@@ -18,7 +18,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
 import javax.swing.SwingUtilities;
@@ -28,7 +27,6 @@ import javax.swing.table.TableRowSorter;
 
 import dao.AbonneDAO;
 import dao.AbonnementDAO;
-import dao.SouscriptionDAO;
 import models.Abonne;
 import models.Abonnement;
 import models.Souscription;
@@ -202,10 +200,17 @@ public class MainMenu extends JFrame {
                 "Voir les statistiques");
         panelStatistiques.setLayout(new BorderLayout(0, 0));
 
-        // Contenu des statistiques
-        JTextArea textAreaStatistiques = new JTextArea();
-        textAreaStatistiques.setEditable(false);
-        panelStatistiques.add(new JScrollPane(textAreaStatistiques), BorderLayout.CENTER);
+        // Create and add the StatistiquesFrame content
+        StatistiquesFrame statistiquesFrame = new StatistiquesFrame();
+        statistiquesFrame.setUndecorated(true);
+        panelStatistiques.add(statistiquesFrame.getContentPane(), BorderLayout.CENTER);
+
+        // Add tab change listener to refresh statistics when tab is selected
+        tabbedPane.addChangeListener(e -> {
+            if (tabbedPane.getSelectedComponent() == panelStatistiques) {
+                statistiquesFrame.rafraichirStatistiques();
+            }
+        });
 
         // Ajout d'un panneau de titre
         JPanel panelTitle = new JPanel();
