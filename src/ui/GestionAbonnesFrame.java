@@ -11,8 +11,10 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import dao.AbonneDAO;
+import dao.AbonnementDAO;
 import dao.dbconn;
 import models.Abonne;
+import models.Abonnement;
 
 public class GestionAbonnesFrame extends JFrame {
     private JTable tableAbonnes;
@@ -177,10 +179,38 @@ public class GestionAbonnesFrame extends JFrame {
         int selectedRow = tableAbonnes.getSelectedRow();
         if (selectedRow != -1) {
             int abonneId = (int) tableAbonnes.getValueAt(selectedRow, 0);
-            int abonnementId = 1; // Example ID, replace with actual logic
-            System.out.println("Souscrire abonnement for Abonne ID: " + abonneId + ", Abonnement ID: " + abonnementId);
-            AbonneDAO.souscrireAbonnement(abonneId, abonnementId);
-            chargerAbonnes();
+            try {
+                // Get all available abonnements
+                List<Abonnement> abonnements = AbonnementDAO.getAllAbonnements();
+                
+                // Create a selection dialog
+                Object[] options = abonnements.stream()
+                        .map(a -> a.getLibelleOffre() + " (" + a.getDureeMois() + " mois - " + a.getPrixMensuel() + "€/mois)")
+                        .toArray();
+                
+                int choice = JOptionPane.showOptionDialog(this,
+                        "Choisissez un type d'abonnement:",
+                        "Souscrire à un abonnement",
+                        JOptionPane.DEFAULT_OPTION,
+                        JOptionPane.QUESTION_MESSAGE,
+                        null,
+                        options,
+                        options[0]);
+                
+                if (choice >= 0) {
+                    int abonnementId = abonnements.get(choice).getId();
+                    try {
+                        AbonneDAO.souscrireAbonnement(abonneId, abonnementId);
+                        chargerAbonnes();
+                        JOptionPane.showMessageDialog(this, "Souscription effectuée avec succès!");
+                    } catch (RuntimeException ex) {
+                        JOptionPane.showMessageDialog(this, ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "Erreur lors de la récupération des abonnements",
+                        "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
         } else {
             JOptionPane.showMessageDialog(this, "Veuillez sélectionner un abonné.");
         }
@@ -190,9 +220,30 @@ public class GestionAbonnesFrame extends JFrame {
         int selectedRow = tableAbonnes.getSelectedRow();
         if (selectedRow != -1) {
             int abonneId = (int) tableAbonnes.getValueAt(selectedRow, 0);
-            System.out.println("Renouveler abonnement for Abonne ID: " + abonneId);
-            AbonneDAO.renouvelerAbonnement(abonneId);
-            chargerAbonnes();
+            boolean isAbonne = tableAbonnes.getValueAt(selectedRow, 4).toString().equals("Oui");
+            
+            if (!isAbonne) {
+                JOptionPane.showMessageDialog(this, 
+                    "Cet abonné n'a pas d'abonnement actif. Veuillez souscrire à un nouvel abonnement.",
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Voulez-vous renouveler l'abonnement?",
+                    "Confirmation",
+                    JOptionPane.YES_NO_OPTION);
+                    
+            if (confirm == JOptionPane.YES_OPTION) {
+                try {
+                    AbonneDAO.renouvelerAbonnement(abonneId);
+                    chargerAbonnes();
+                    JOptionPane.showMessageDialog(this, "Abonnement renouvelé avec succès!");
+                } catch (RuntimeException ex) {
+                    JOptionPane.showMessageDialog(this, ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                }
+            }
         } else {
             JOptionPane.showMessageDialog(this, "Veuillez sélectionner un abonné.");
         }
@@ -202,9 +253,30 @@ public class GestionAbonnesFrame extends JFrame {
         int selectedRow = tableAbonnes.getSelectedRow();
         if (selectedRow != -1) {
             int abonneId = (int) tableAbonnes.getValueAt(selectedRow, 0);
-            System.out.println("Résilier abonnement for Abonne ID: " + abonneId);
-            AbonneDAO.resilierAbonnement(abonneId);
-            chargerAbonnes();
+            boolean isAbonne = tableAbonnes.getValueAt(selectedRow, 4).toString().equals("Oui");
+            
+            if (!isAbonne) {
+                JOptionPane.showMessageDialog(this, 
+                    "Cet abonné n'a pas d'abonnement actif.",
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "Êtes-vous sûr de vouloir résilier l'abonnement?",
+                    "Confirmation",
+                    JOptionPane.YES_NO_OPTION);
+                    
+            if (confirm == JOptionPane.YES_OPTION) {
+                try {
+                    AbonneDAO.resilierAbonnement(abonneId);
+                    chargerAbonnes();
+                    JOptionPane.showMessageDialog(this, "Abonnement résilié avec succès!");
+                } catch (RuntimeException ex) {
+                    JOptionPane.showMessageDialog(this, ex.getMessage(), "Erreur", JOptionPane.ERROR_MESSAGE);
+                }
+            }
         } else {
             JOptionPane.showMessageDialog(this, "Veuillez sélectionner un abonné.");
         }
