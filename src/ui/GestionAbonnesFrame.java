@@ -1,25 +1,17 @@
 package ui;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.util.List;
-
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.RowFilter;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
-
+import java.awt.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.List;
 import dao.AbonneDAO;
+import dao.dbconn;
 import models.Abonne;
 
 public class GestionAbonnesFrame extends JFrame {
@@ -185,7 +177,9 @@ public class GestionAbonnesFrame extends JFrame {
         int selectedRow = tableAbonnes.getSelectedRow();
         if (selectedRow != -1) {
             int abonneId = (int) tableAbonnes.getValueAt(selectedRow, 0);
-            AbonneDAO.souscrireAbonnement(abonneId);
+            int abonnementId = 1; // Example ID, replace with actual logic
+            System.out.println("Souscrire abonnement for Abonne ID: " + abonneId + ", Abonnement ID: " + abonnementId);
+            AbonneDAO.souscrireAbonnement(abonneId, abonnementId);
             chargerAbonnes();
         } else {
             JOptionPane.showMessageDialog(this, "Veuillez sélectionner un abonné.");
@@ -196,6 +190,7 @@ public class GestionAbonnesFrame extends JFrame {
         int selectedRow = tableAbonnes.getSelectedRow();
         if (selectedRow != -1) {
             int abonneId = (int) tableAbonnes.getValueAt(selectedRow, 0);
+            System.out.println("Renouveler abonnement for Abonne ID: " + abonneId);
             AbonneDAO.renouvelerAbonnement(abonneId);
             chargerAbonnes();
         } else {
@@ -207,6 +202,7 @@ public class GestionAbonnesFrame extends JFrame {
         int selectedRow = tableAbonnes.getSelectedRow();
         if (selectedRow != -1) {
             int abonneId = (int) tableAbonnes.getValueAt(selectedRow, 0);
+            System.out.println("Résilier abonnement for Abonne ID: " + abonneId);
             AbonneDAO.resilierAbonnement(abonneId);
             chargerAbonnes();
         } else {
@@ -229,7 +225,7 @@ public class GestionAbonnesFrame extends JFrame {
                     abonne.getNom(),
                     abonne.getPrenom(),
                     abonne.getNumeroTelephone(),
-                    abonne.isAbonne() ? "Oui" : "Non"
+                    abonne.getAbonnementActif() ? "Oui" : "Non"
             });
         }
     }

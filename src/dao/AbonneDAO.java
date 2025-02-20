@@ -48,7 +48,7 @@ public class AbonneDAO {
         return abonnes;
     }
 
-    public Abonne searchAbonne(String nom) {
+    public static Abonne searchAbonne(String nom) {
         Abonne abonne = null;
         String sql = "SELECT * FROM abonne WHERE nom = ?";
         try (Connection conn = dbconn.getConnection();
@@ -71,13 +71,13 @@ public class AbonneDAO {
         return abonne;
     }
 
-    public Abonne getAbonneWithAbonnement(int id) {
+    public static Abonne getAbonneWithAbonnement(int id) {
         Abonne abonne = null;
         String sql = "SELECT a.*, s.id_abonnement, ab.libelle, ab.duree_mois, ab.prix_mensuel " +
-                     "FROM abonne a " +
-                     "LEFT JOIN souscription s ON a.id = s.id_abonne " +
-                     "LEFT JOIN abonnement ab ON s.id_abonnement = ab.id " +
-                     "WHERE a.id = ?";
+                "FROM abonne a " +
+                "LEFT JOIN souscription s ON a.id = s.id_abonne " +
+                "LEFT JOIN abonnement ab ON s.id_abonnement = ab.id " +
+                "WHERE a.id = ?";
         try (Connection conn = dbconn.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -132,7 +132,7 @@ public class AbonneDAO {
         }
     }
 
-    public int getActiveAbonneCount() {
+    public static int getActiveAbonneCount() {
         int count = 0;
         String sql = "SELECT COUNT(*) AS total FROM abonne WHERE statut_souscription = true";
         try (Connection conn = dbconn.getConnection();
@@ -147,45 +147,104 @@ public class AbonneDAO {
         return count;
     }
 
-    public static void subscribeAbonne(int id, int id2) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'subscribeAbonne'");
+    public static void souscrireAbonnement(int abonneId, int abonnementId) {
+        String sqlCheck = "SELECT COUNT(*) FROM souscription WHERE id_abonne = ? AND date_fin IS NULL";
+        String sqlInsert = "INSERT INTO souscription (id_abonne, id_abonnement, date_debut) VALUES (?, ?, ?)";
+        String sqlUpdateAbonne = "UPDATE abonne SET statut_souscription = true WHERE id = ?";
+        String updateSql = "UPDATE Abonnement SET statut = 'expiré' WHERE date_fin < NOW() AND statut = 'actif'";
+        String sql = "SELECT COUNT(*) FROM Abonnement WHERE abonne_id = ? AND statut = 'actif'";
+
+
+        try (Connection conn = dbconn.getConnection()) {
+            conn.setAutoCommit(false); // Début de transaction
+
+            try (PreparedStatement stmtCheck = conn.prepareStatement(sqlCheck)) {
+                stmtCheck.setInt(1, abonneId);
+                try (ResultSet rs = stmtCheck.executeQuery()) {
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        throw new SQLException("L'abonné a déjà un abonnement actif.");
+                    }
+                }
+            }
+
+            try (PreparedStatement stmtInsert = conn.prepareStatement(sqlInsert)) {
+                stmtInsert.setInt(1, abonneId);
+                stmtInsert.setInt(2, abonnementId);
+                stmtInsert.setDate(3, new java.sql.Date(System.currentTimeMillis()));
+                stmtInsert.executeUpdate();
+            }
+
+            try (PreparedStatement stmtUpdateAbonne = conn.prepareStatement(sqlUpdateAbonne)) {
+                stmtUpdateAbonne.setInt(1, abonneId);
+                stmtUpdateAbonne.executeUpdate();
+            }
+
+            conn.commit(); // Valider la transaction
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erreur lors de la souscription : " + e.getMessage());
+        }
     }
 
-    public static void souscrireAbonnement(int abonneId, int abonnementId) {
-        String sql = "INSERT INTO souscription (id_abonne, id_abonnement, date_debut) VALUES (?, ?, ?)";
-        try (Connection conn = dbconn.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, abonneId);
-            stmt.setInt(2, abonnementId);
-            stmt.setDate(3, new java.sql.Date(System.currentTimeMillis())); // Date de début de la souscription
-            stmt.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    
+
     public static void renouvelerAbonnement(int abonneId) {
-        String sql = "UPDATE souscription SET date_debut = ? WHERE id_abonne = ? AND date_fin IS NULL";
+        String sqlCheck = "SELECT id_abonnement FROM souscription WHERE id_abonne = ? AND date_fin IS NULL";
+        String sqlUpdate = "UPDATE souscription SET date_debut = ? WHERE id_abonne = ? AND date_fin IS NULL";
+
         try (Connection conn = dbconn.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setDate(1, new java.sql.Date(System.currentTimeMillis())); // Met à jour la date de début
-            stmt.setInt(2, abonneId);
-            stmt.executeUpdate();
+             PreparedStatement stmtCheck = conn.prepareStatement(sqlCheck);
+             PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate)) {
+
+            // Vérifier si l'abonné a un abonnement actif
+            stmtCheck.setInt(1, abonneId);
+            ResultSet rs = stmtCheck.executeQuery();
+            if (!rs.next()) {
+                throw new SQLException("L'abonné n'a pas d'abonnement actif à renouveler.");
+            }
+
+            // Renouveler l'abonnement
+            stmtUpdate.setDate(1, new java.sql.Date(System.currentTimeMillis()));
+            stmtUpdate.setInt(2, abonneId);
+            int updatedRows = stmtUpdate.executeUpdate();
+
+            if (updatedRows == 0) {
+                throw new SQLException("Aucun abonnement actif trouvé pour cet abonné.");
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Erreur lors du renouvellement de l'abonnement: " + e.getMessage());
         }
     }
-    
+
     public static void resilierAbonnement(int abonneId) {
-        String sql = "UPDATE souscription SET date_fin = ? WHERE id_abonne = ? AND date_fin IS NULL";
+        String sqlUpdate = "UPDATE souscription SET date_fin = ? WHERE id_abonne = ? AND date_fin IS NULL";
+        String sqlUpdateAbonne = "UPDATE abonne SET statut_souscription = false WHERE id = ?";
+
         try (Connection conn = dbconn.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setDate(1, new java.sql.Date(System.currentTimeMillis())); // Met à jour la date de fin
-            stmt.setInt(2, abonneId);
-            stmt.executeUpdate();
+             PreparedStatement stmtUpdate = conn.prepareStatement(sqlUpdate);
+             PreparedStatement stmtUpdateAbonne = conn.prepareStatement(sqlUpdateAbonne)) {
+
+            conn.setAutoCommit(false);
+
+            // Résilier l'abonnement
+            stmtUpdate.setDate(1, new java.sql.Date(System.currentTimeMillis()));
+            stmtUpdate.setInt(2, abonneId);
+            int updatedRows = stmtUpdate.executeUpdate();
+
+            if (updatedRows == 0) {
+                throw new SQLException("Aucun abonnement actif trouvé pour cet abonné.");
+            }
+
+            // Mettre à jour le statut de l'abonné
+            stmtUpdateAbonne.setInt(1, abonneId);
+            stmtUpdateAbonne.executeUpdate();
+
+            conn.commit();
+
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Erreur lors de la résiliation de l'abonnement: " + e.getMessage());
         }
     }
 }
