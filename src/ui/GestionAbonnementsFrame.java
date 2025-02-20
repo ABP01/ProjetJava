@@ -151,13 +151,20 @@ public class GestionAbonnementsFrame extends JFrame {
         try {
             AbonnementDAO abonnementDAO = new AbonnementDAO();
             abonnementDAO.addAbonnement(abonnement);
-            chargerAbonnements();
+            chargerAbonnements(); // Refresh data
+            clearFields(); // Clear input fields
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Erreur lors de l'ajout de l'abonnement.");
             e.printStackTrace();
         }
     }
 
+    // Add this new helper method
+    private void clearFields() {
+        txtLibelle.setText("");
+        txtDuree.setText("");
+        txtPrix.setText("");
+    }
     private void remplirChampsPourModification() {
         int selectedRow = tableAbonnements.getSelectedRow();
         if (selectedRow != -1) {
@@ -198,7 +205,8 @@ public class GestionAbonnementsFrame extends JFrame {
         try {
             AbonnementDAO abonnementDAO = new AbonnementDAO();
             abonnementDAO.updateAbonnement(abonnement);
-            chargerAbonnements();
+            chargerAbonnements(); // Refresh data
+            clearFields(); // Clear input fields
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Erreur lors de la mise à jour de l'abonnement.");
             e.printStackTrace();
@@ -214,7 +222,8 @@ public class GestionAbonnementsFrame extends JFrame {
             if (confirm == JOptionPane.YES_OPTION) {
                 try {
                     AbonnementDAO.deleteAbonnement(abonnementId);
-                    chargerAbonnements();
+                    chargerAbonnements(); // Refresh data
+                    clearFields(); // Clear input fields
                 } catch (SQLException e) {
                     JOptionPane.showMessageDialog(this, "Erreur lors de la suppression de l'abonnement.");
                     e.printStackTrace();

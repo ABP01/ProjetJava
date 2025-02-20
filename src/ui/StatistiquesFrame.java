@@ -99,7 +99,7 @@ public class StatistiquesFrame extends JFrame {
             // Update labels directly without animation for testing
             lblTotalAbonnes.setText("Total des abonnés: " + totalAbonnes);
             lblAbonnesActifs.setText("Abonnés actifs: " + abonnesActifs);
-            lblRevenuMensuel.setText("Revenu mensuel: " + String.format("%,.2f €", revenuMensuel));
+            lblRevenuMensuel.setText("Revenu mensuel: " + String.format("%,.2f FCFA", revenuMensuel));
             lblAbonnementPopulaire.setText("Abonnement le plus populaire: " + abonnementPopulaire);
 
         } catch (Exception e) {

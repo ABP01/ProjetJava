@@ -185,7 +185,8 @@ public class GestionAbonnesFrame extends JFrame {
                 
                 // Create a selection dialog
                 Object[] options = abonnements.stream()
-                        .map(a -> a.getLibelleOffre() + " (" + a.getDureeMois() + " mois - " + a.getPrixMensuel() + "€/mois)")
+                        .map(a -> a.getLibelleOffre() + " (" + a.getDureeMois() + " mois - " + a.getPrixMensuel()
+                                + "FCFA/mois)")
                         .toArray();
                 
                 int choice = JOptionPane.showOptionDialog(this,
